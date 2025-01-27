@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity()
 export class Document {
@@ -17,9 +18,12 @@ export class Document {
     @Column()
     title: string;
 
-    @Column({type: 'datetime'})
+    @Column({type: 'datetime', default: () => 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 
     @Column({type: 'datetime'})
     updatedAt: Date;
+
+    @ManyToOne(() => User, user => user.documents)
+    user: User;
 }
