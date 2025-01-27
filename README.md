@@ -1,99 +1,110 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Car Rental - 🚗
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project is a web application designed to streamline car rental and management operations for a car rental company based in Australia. The system enables users to rent cars efficiently while providing administrators with tools to manage inventory and rental requests.
 
-## Description
+## 🚀 Overview
+The system provides a seamless experience for both users and administrators, featuring the following capabilities:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **For Users**:
+  - Sign up, log in, recover password, and log out.
+  - Browse a catalog of available cars with detailed descriptions and images.
+  - Submit rental requests with required document uploads.
+  - Access a historical list of previous rental requests.
 
-## Project setup
+- **For Administrators**:
+  - Add, edit, delete, and manage car listings, including uploading car images.
+  - Review, approve, or reject rental requests based on user-provided documents.
+  - View the complete history of users' rental requests.
 
-```bash
-$ npm install
-```
+- **Payment Integration**:
+  - Use of the Stellar Network for secure cryptocurrency payments in USDC.
+  - Real-time conversion check to ensure users have sufficient funds before completing transactions.
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## 📦 Tech Stack
+This PoC leverages modern web development technologies and tools:
+- **Frontend**: React with TypeScript and Tailwind UI.
+- **Backend**: NestJS with TypeScript.
+- **Database**: MySQL.
+- **Infrastructure**:
+  - **AWS S3**: For storing car images and user-uploaded documents.
+  - **AWS Cognito**: For secure authentication and authorization.
+  - **LocalStack**: To emulate AWS services during development.
 
-# watch mode
-$ npm run start:dev
+---
 
-# production mode
-$ npm run start:prod
-```
+## 🔧 Installation and Setup
+Follow these steps to set up the project locally:
 
-## Run tests
+### Prerequisites
+Ensure you have the following installed on your system:
+- Node.js >= 18
+- MySQL database
+- Stellar wallet account for cryptocurrency transactions.
 
-```bash
-# unit tests
-$ npm run test
+### Steps
+1. Clone the repository to your local machine:
+   ```bash
+   git clone https://github.com/nahufed/rent-a-car.git
+   cd rent-a-car
+   ```
+2. Install the required dependencies:
+   ```bash
+   npm install
+   ```
+3. Configure the environment variables by creating a `.env` file in the project root and adding the following:
+   - MySQL database credentials (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`).
+   - AWS credentials for S3 (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`).
+   - Stellar wallet keys (`STELLAR_PUBLIC_KEY`, `STELLAR_SECRET_KEY`).
+4. Start the application:
+   ```bash
+   npm run start
+   ```
 
-# e2e tests
-$ npm run test:e2e
+---
 
-# test coverage
-$ npm run test:cov
-```
+## 📑 System Architecture
+The application has a modular design to separate responsibilities between users, administrators, rentals, and car management. The system architecture includes:
 
-## Deployment
+- **Frontend**: A responsive web interface built with React.
+- **Backend**: A RESTful API built with NestJS for handling requests and managing data.
+- **Database**: MySQL for data storage, including users, cars, and rental requests.
+- **File Storage**: AWS S3 for managing user-uploaded documents and car images.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+[View a detailed system diagram here](https://drive.google.com/file/d/1gezI8NrUO-1QIOqCYx2NFanwinXwWuJe/view?usp=sharing).
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+---
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
+## 🛠 Work in Progress
+This PoC is under active development, with the following features planned:
+- Responsive design using **Figma** for an optimized user experience.
+- Improved user flows for payment processing and document uploads.
+- Expansion of admin tools to manage roles and permissions dynamically.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## ✨ Contributing
+We welcome contributions to improve the project! Follow these steps to contribute:
+1. **Fork** this repository to your GitHub account.
+2. **Create a new branch** for your feature or bugfix:
+   ```bash
+   git checkout -b my-feature
+   ```
+3. **Commit your changes** with a descriptive message:
+   ```bash
+   git commit -m "Add feature X"
+   ```
+4. **Push your changes** to your fork:
+   ```bash
+   git push origin my-feature
+   ```
+5. Submit a **pull request** to the main repository.
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 📝 License
+This project is protected under a custom license. For more information about usage or permissions, please contact the development team.
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
