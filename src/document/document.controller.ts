@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { DocumentService } from './document.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
+import { Document } from './document.interface';
 
 @Controller('document')
 export class DocumentController {
@@ -13,7 +14,7 @@ export class DocumentController {
   }
 
   @Get()
-  findAll() {
+  findAll() :Document[] {
     return this.documentService.findAll();
   }
 
