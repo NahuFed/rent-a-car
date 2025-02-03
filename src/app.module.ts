@@ -13,6 +13,8 @@ import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
 import { RoleService } from './role/role.service';
 import { RoleController } from './role/role.controller';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -25,7 +27,10 @@ import { RoleController } from './role/role.controller';
     autoLoadEntities: true,
     entities: [__dirname + '/**/*.entity{.ts,.js}',User],
     synchronize: true,
-  }),UserModule,DocumentModule, RoleModule,RoleModule],
+  }), ConfigModule.forRoot({
+    envFilePath: '.development.env',
+    isGlobal: true,
+  }), UserModule,DocumentModule, RoleModule,RoleModule, AuthModule],
   controllers: [AppController,UserController,DocumentController,RoleController],
   providers: [AppService,DocumentService,RoleService,UserService],
 })
