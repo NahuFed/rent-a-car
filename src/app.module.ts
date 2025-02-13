@@ -28,7 +28,7 @@ import { AuthModule } from './auth/auth.module';
     entities: [__dirname + '/**/*.entity{.ts,.js}',User],
     synchronize: true,
   }), ConfigModule.forRoot({
-    envFilePath: '.development.env',
+    envFilePath: '.env.development',
     isGlobal: true,
   }), UserModule,DocumentModule, RoleModule,RoleModule, AuthModule],
   controllers: [AppController,UserController,DocumentController,RoleController],
