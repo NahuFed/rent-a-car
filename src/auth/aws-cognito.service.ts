@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import {
   AuthenticationDetails,
   CognitoUser,
@@ -15,13 +15,17 @@ import { AuthRegisterUserDto } from './dto/auth-register-user.dto';
 import { AuthChangePasswordUserDto } from './dto/auth-change-password-user.dto';
 import { AuthForgotPasswordUserDto } from './dto/auth-forgot-password-user.dto';
 import { AuthConfirmPasswordUserDto } from './dto/auth-confirm-password-user.dto';
-
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UserService } from 'src/user/user.service';
 @Injectable()
 export class AwsCognitoService {
   private userPool: CognitoUserPool;
   private cognitoISP: CognitoIdentityProvider;
 
-  constructor() {
+  constructor(
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
+  ) {
     this.userPool = new CognitoUserPool({
       UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID || '',
       ClientId: process.env.AWS_COGNITO_CLIENT_ID || '',
@@ -39,7 +43,7 @@ export class AwsCognitoService {
   }
 
   async registerUser(authRegisterUserDto: AuthRegisterUserDto) {
-    const { name, email, password } = authRegisterUserDto;
+    const { email, password, firstName, lastName, dob, address, country, role } = authRegisterUserDto;
 
     return new Promise((resolve, reject) => {
       this.userPool.signUp(
@@ -48,7 +52,11 @@ export class AwsCognitoService {
         [
           new CognitoUserAttribute({
             Name: 'name',
-            Value: name,
+            Value: firstName + ' ' + lastName,
+          }),
+          new CognitoUserAttribute({
+            Name: 'custom:role',
+            Value: role.name,
           }),
         ],
         [],
@@ -61,6 +69,19 @@ export class AwsCognitoService {
                 UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID || '',
                 Username: email,
               });
+              const createUserDto: CreateUserDto = {
+                firstName: firstName,
+                lastName: lastName,
+                dob: new Date(dob),
+                email,
+                address,
+                country,
+                role,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              };
+              await this.userService.create(createUserDto);
+
               resolve(result?.user);
             } catch (confirmErr) {
               reject(confirmErr);

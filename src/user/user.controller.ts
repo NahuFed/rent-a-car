@@ -7,6 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/auth/roles.decorator';
 import { RoleType } from 'src/role/entities/role.entity';
+import { RolesGuard } from 'src/auth/roles.guard';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
@@ -15,7 +16,7 @@ export class UserController {
   create(@Body() newUser: CreateUserDto): Promise<User> {
     return this.userService.create(newUser);
   }
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Get()
   @Roles(RoleType.ADMIN)
   getUsers(): Promise <User[]> {
