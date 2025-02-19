@@ -2,11 +2,12 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import {UserService} from '../user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   private readonly logger = new Logger(JwtStrategy.name);
-  constructor() {
+  constructor(private readonly userService: UserService) {
     const cognitoAuthority = (process.env.AWS_COGNITO_AUTHORITY || '').replace(/\/$/, '');
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -24,8 +25,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    const user = await this.userService.getUserByEmail(payload.username);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
     this.logger.debug(`JWT payload: ${JSON.stringify(payload)}`);
-    return { idUser: payload.sub, email: payload.email };
+    console.log(user.role.name);
+    return { idUser: payload.sub, email: payload.email, role: user.role.name };
   }
 
   handleRequest(err, user, info, context) {

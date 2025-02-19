@@ -5,6 +5,8 @@ import { User } from './entities/user.entity';
 import { NotFoundException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/auth/roles.decorator';
+import { RoleType } from 'src/role/entities/role.entity';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
@@ -15,6 +17,7 @@ export class UserController {
   }
   @UseGuards(AuthGuard('jwt'))
   @Get()
+  @Roles(RoleType.ADMIN)
   getUsers(): Promise <User[]> {
     return this.userService.getUsers();
   }
