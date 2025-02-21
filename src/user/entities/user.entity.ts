@@ -18,6 +18,9 @@ export class User {
     dob: Date;
 
     @Column()
+    email: string;
+
+    @Column()
     address: string;
 
     @Column()

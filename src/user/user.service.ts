@@ -24,6 +24,12 @@ export class UserService {
     });
   }
 
+  getUserByEmail(email: string) {
+    return this.userRepository.findOne({
+      where: { email },
+    });
+  }
+
   deleteUser(id: number) {
     return this.userRepository.delete(id);
   }
