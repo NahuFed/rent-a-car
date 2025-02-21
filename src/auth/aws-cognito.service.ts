@@ -51,6 +51,10 @@ export class AwsCognitoService {
         password,
         [
           new CognitoUserAttribute({
+            Name: 'email',
+            Value: email,
+          }),
+          new CognitoUserAttribute({
             Name: 'name',
             Value: firstName + ' ' + lastName,
           }),
