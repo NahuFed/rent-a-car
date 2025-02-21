@@ -16,7 +16,7 @@ export class UserController {
   create(@Body() newUser: CreateUserDto): Promise<User> {
     return this.userService.create(newUser);
   }
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   @Roles(RoleType.ADMIN)
   getUsers(): Promise <User[]> {

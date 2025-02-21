@@ -40,4 +40,17 @@ export class UserService {
       updatedAt: new Date(),
     });
   }
+
+  private verificationCodes = new Map<string, string>();
+
+  async storeVerificationCode(email: string, code: string) {
+    this.verificationCodes.set(email, code);    
+    setTimeout(() => this.verificationCodes.delete(email), 10 * 60 * 1000); // 10 minutos
+  }
+
+  async verifyCode(email: string, code: string): Promise<boolean> {
+    const storedCode = this.verificationCodes.get(email);
+    return storedCode === code;
+  }
+
 }

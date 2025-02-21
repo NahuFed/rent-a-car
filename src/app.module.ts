@@ -15,23 +15,45 @@ import { RoleService } from './role/role.service';
 import { RoleController } from './role/role.controller';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { BullModule } from '@nestjs/bull';
+import { EmailModule } from './email/email.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot({
-    type: 'mysql',
-    host: 'localhost',
-    port: 3306,
-    username: 'root',
-    password: '1234',
-    database: 'rent_a_car',
-    autoLoadEntities: true,
-    entities: [__dirname + '/**/*.entity{.ts,.js}',User],
-    synchronize: true,
-  }), ConfigModule.forRoot({
-    envFilePath: '.env.development',
-    isGlobal: true,
-  }), UserModule,DocumentModule, RoleModule,RoleModule, AuthModule],
-  controllers: [AppController,UserController,DocumentController,RoleController],
-  providers: [AppService,DocumentService,RoleService,UserService],
+  imports: [
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '1234',
+      database: 'rent_a_car',
+      autoLoadEntities: true,
+      entities: [__dirname + '/**/*.entity{.ts,.js}', User],
+      synchronize: true,
+    }),
+    ConfigModule.forRoot({
+      envFilePath: '.env.development',
+      isGlobal: true,
+    }),
+    UserModule,
+    DocumentModule,
+    RoleModule,
+    RoleModule,
+    AuthModule,
+    EmailModule,
+  ],
+  controllers: [
+    AppController,
+    UserController,
+    DocumentController,
+    RoleController,
+  ],
+  providers: [AppService, DocumentService, RoleService, UserService],
 })
 export class AppModule {}
