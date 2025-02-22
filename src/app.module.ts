@@ -17,6 +17,9 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { BullModule } from '@nestjs/bull';
 import { EmailModule } from './email/email.module';
+import { CarModule } from './car/car.module';
+import { PictureModule } from './picture/picture.module';
+import { CarPictureModule } from './car-picture/car-picture.module';
 
 @Module({
   imports: [
@@ -47,6 +50,9 @@ import { EmailModule } from './email/email.module';
     RoleModule,
     AuthModule,
     EmailModule,
+    CarModule,
+    PictureModule,
+    CarPictureModule,
   ],
   controllers: [
     AppController,
