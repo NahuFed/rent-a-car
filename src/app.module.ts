@@ -20,6 +20,7 @@ import { EmailModule } from './email/email.module';
 import { CarModule } from './car/car.module';
 import { PictureModule } from './picture/picture.module';
 import { CarPictureModule } from './car-picture/car-picture.module';
+import { RentModule } from './rent/rent.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { CarPictureModule } from './car-picture/car-picture.module';
     CarModule,
     PictureModule,
     CarPictureModule,
+    RentModule,
   ],
   controllers: [
     AppController,

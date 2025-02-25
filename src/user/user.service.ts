@@ -45,7 +45,7 @@ export class UserService {
 
   async storeVerificationCode(email: string, code: string) {
     this.verificationCodes.set(email, code);    
-    setTimeout(() => this.verificationCodes.delete(email), 10 * 60 * 1000); // 10 minutos
+    setTimeout(() => this.verificationCodes.delete(email), 10 * 60 * 1000); 
   }
 
   async verifyCode(email: string, code: string): Promise<boolean> {

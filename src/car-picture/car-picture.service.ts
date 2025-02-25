@@ -12,9 +12,9 @@ export class CarPictureService {
 
   async initializeCarPictures(): Promise<void> {
     const existingCarPictures = await this.carPictureRepository.find();
-    const existingTypes = new Set(existingCarPictures.map(cp => cp.name)); // 🔹 Guardamos los tipos ya existentes
+    const existingTypes = new Set(existingCarPictures.map(cp => cp.name)); 
   
-    const missingTypes = Object.values(CarPictureType).filter(type => !existingTypes.has(type)); // 🔹 Comparamos con el ENUM
+    const missingTypes = Object.values(CarPictureType).filter(type => !existingTypes.has(type)); 
   
     if (missingTypes.length > 0) {
       const carPictureEntities = missingTypes.map(type => this.carPictureRepository.create({ name: type }));

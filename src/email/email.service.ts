@@ -7,10 +7,10 @@ export class EmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      service: 'gmail', // 🔹 Cambiá esto si usás otro proveedor
+      service: 'gmail', 
       auth: {
-        user: process.env.EMAIL_USER, // 📌 Agregá esto en el .env
-        pass: process.env.EMAIL_PASS, // 📌 Agregá esto en el .env
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS, 
       },
     });
   }

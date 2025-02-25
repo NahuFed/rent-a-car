@@ -174,14 +174,13 @@ export class AwsCognitoService {
   async forgotUserPassword(authForgotPasswordUserDto: AuthForgotPasswordUserDto) {
     const { email } = authForgotPasswordUserDto;
 
-    // Generar el código de verificación
+
     const confirmationCode = this.generateVerificationCode();
     console.log(`✅ Forgot Password Code for ${email}: ${confirmationCode}`);
 
-    // Almacenar el código en la base de datos o caché
     await this.userService.storeVerificationCode(email, confirmationCode);
 
-    // Enviar el código por email usando Bull
+ 
     await this.emailQueue.add('sendEmail', {
       to: email,
       subject: 'Reset Your Password',
@@ -197,13 +196,13 @@ export class AwsCognitoService {
   ) {
     const { email, confirmationCode, newPassword } = authConfirmPasswordUserDto;
 
-    // Verificar el código
+
     const isValidCode = await this.userService.verifyCode(email, confirmationCode);
     if (!isValidCode) {
       throw new Error('Invalid or expired confirmation code');
     }
 
-    // Cambiar la contraseña directamente en Cognito Local
+    
     const params = {
       UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID || '', 
       ClientId: process.env.AWS_COGNITO_CLIENT_ID || '',

@@ -36,7 +36,7 @@ export class PictureController {
   @Get('/cars/:carId')
   async findPicturesByCar(
     @Param('carId', ParseIntPipe) carId: number,
-    @Query('type') type?: CarPictureType, // 🔹 Ahora se filtra por el enum de CarPicture
+    @Query('type') type?: CarPictureType, 
   ) {
     return await this.pictureService.findByCar(carId, type);
   }

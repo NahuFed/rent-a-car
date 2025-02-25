@@ -7,10 +7,10 @@ import { EmailService } from './email.service';
 @Module({
   imports: [
     BullModule.registerQueue({
-      name: 'email-queue', // Asegúrate de que el nombre coincide
+      name: 'email-queue', 
     }),
   ],
   providers: [EmailProcessor, EmailService],
-  exports: [BullModule], // Exporta BullModule para que la cola se pueda inyectar en otros módulos
+  exports: [BullModule],
 })
 export class EmailModule {}
