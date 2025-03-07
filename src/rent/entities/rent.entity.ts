@@ -24,9 +24,9 @@ export class Rent {
   @JoinColumn({ name: 'userId' })
   user: User;
   
-  @ManyToOne(() => User, (user) => user.rents)
-  @JoinColumn({ name: 'adminId' })
-  admin: User;
+  @ManyToOne(() => User, (user) => user.rents, {nullable: true})
+  @JoinColumn({ name: 'adminId'})
+  admin: User | null;
 
   @Column({ type: 'date', nullable: true })
   acceptedDated: Date | null;

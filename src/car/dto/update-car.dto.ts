@@ -7,7 +7,7 @@ export class UpdateCarDto extends PartialType(CreateCarDto) {
      color?: string;
      passengers?: number;
      ac?: boolean;
-     princePerDay?: number;
+     pricePerDay?: number;
      craetedAt?: Date;
      updatedAt?: Date;    
 }

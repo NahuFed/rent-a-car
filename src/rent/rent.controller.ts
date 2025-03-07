@@ -1,7 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { RentService } from './rent.service';
 import { CreateRentDto } from './dto/create-rent.dto';
 import { UpdateRentDto } from './dto/update-rent.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/user/entities/user.entity';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { RoleType } from 'src/role/entities/role.entity';
 
 @Controller('rent')
 export class RentController {
@@ -42,10 +48,6 @@ export class RentController {
     return this.rentService.remove(+id);
   }
 
-  @Patch(':id/extend')
-  extendRent(@Param('id') id: string, @Body('newDueDate') newDueDate: Date) {
-    return this.rentService.extendRent(+id, newDueDate);
-  }
 
   @Patch(':id/cancel')
   cancelRent(@Param('id') id: string) {
@@ -57,35 +59,32 @@ export class RentController {
     return this.rentService.findRentsByStatus(status);
   }
 
-  @Get('active')
-  findActiveRents() {
-    return this.rentService.findActiveRents();
-  }
-
-  @Get('past')
-  findPastRents() {
-    return this.rentService.findPastRents();
-  }
-
-  @Get('future')
-  findFutureRents() {
-    return this.rentService.findFutureRents();
-  }
 
   @Get('requests')
   listRentRequests() {
     return this.rentService.listRentRequests();
   }
 
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(RoleType.ADMIN)
   @Patch('requests/:id/admit')
-  admitRentRequest(@Param('id') id: string) {
-    return this.rentService.admitRentRequest(+id);
+  admitRentRequest(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() admin: User,
+  ) {
+    return this.rentService.admitRentRequest(id, admin);
   }
 
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(RoleType.ADMIN)
   @Patch('requests/:id/reject')
-  rejectRentRequest(@Param('id') id: string) {
-    return this.rentService.rejectRentRequest(+id);
+  rejectRentRequest(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() admin: User,
+  ) {
+    return this.rentService.rejectRentRequest(id, admin);
   }
+
 
   @Get('user/:id/history')
   getUserRentHistory(@Param('id') id: string) {
@@ -95,5 +94,11 @@ export class RentController {
   @Get('history')
   getAllRentHistory() {
     return this.rentService.getAllRentHistory();
+  }
+
+  @Get('availability/:carId')
+  async getAvailability(@Param('carId') carId: string) {
+    const unavailableDates = await this.rentService.getUnavailableDates(+carId);
+    return { unavailableDates };
   }
 }

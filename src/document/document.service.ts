@@ -1,45 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
-import { Document } from './document.interface';
+import { Document } from './entities/document.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class DocumentService {
 
-  documents: Document[] = [
-    {
-      id: 1,
-      title: 'Document 1',
-      content: 'This is document 1',
-      createdAt: new Date('2021-01-01'),
-      updatedAt: new Date('2021-01-01')
-    },
-    {
-      id: 2,
-      title: 'Document 2',
-      content: 'This is document 2',
-      createdAt: new Date('2021-01-01'),
-      updatedAt: new Date('2021-01-01')
-    }
-  ]
+  constructor(
+    @InjectRepository(Document) private documentRepository: Repository<Document>,
+  ){}
 
   create(createDocumentDto: CreateDocumentDto) {
-    return 'This action adds a new document';
+    const document = this.documentRepository.create(createDocumentDto);
+    return this.documentRepository.save(document);
+    
   }
 
-  findAll(): Document[] {
-    return this.documents;
+  findAll() {
+    return this.documentRepository.find();
   }
 
   findOne(id: number) {
-    return this.documents.find(document => document.id === id);
+    return this.documentRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    }
+    );
   }
 
   update(id: number, updateDocumentDto: UpdateDocumentDto) {
-    return `This action updates a #${id} document`;
+    return this.documentRepository.update(id, {
+      ...document,
+      updatedAt: new Date(),
+    }
+    );
   }
 
   remove(id: number) {
-    return `This action removes a #${id} document`;
+    return this.documentRepository.delete(id);
+  }
+
+  async findUserDocuments(user: number) {
+    return this.documentRepository.find({
+      where: { user: {id: user} },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+    });
   }
 }

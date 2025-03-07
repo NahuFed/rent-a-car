@@ -41,4 +41,14 @@ export class UserController {
   updateUser(@Param('id') id: number, @Body() user: UpdateUserDto) {
     return this.userService.updateUser(id, user);
   }
+
+  @Get('email/:email')
+  async getUserByEmail(@Param('email') email: string): Promise<User> {
+    const user = await this.userService.getUserByEmail(email);
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    return user;
+  }
 }
+

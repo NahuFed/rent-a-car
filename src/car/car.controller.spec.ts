@@ -43,7 +43,7 @@ describe('CarController', () => {
         color: 'Red',
         passengers: 5,
         ac: true,
-        princePerDay: 50,
+        pricePerDay: 50,
       };
 
       const result = {
@@ -68,7 +68,7 @@ describe('CarController', () => {
           color: 'Red',
           passengers: 5,
           ac: true,
-          princePerDay: 50,
+          pricePerDay: 50,
         },
       ];
 
@@ -88,7 +88,7 @@ describe('CarController', () => {
         color: 'Red',
         passengers: 5,
         ac: true,
-        princePerDay: 50,
+        pricePerDay: 50,
       };
 
       mockCarService.findOne.mockResolvedValue(result);
@@ -106,7 +106,7 @@ describe('CarController', () => {
         color: 'Blue',
         passengers: 5,
         ac: true,
-        princePerDay: 55,
+        pricePerDay: 55,
       };
 
       const result = {

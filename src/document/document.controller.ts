@@ -14,7 +14,7 @@ export class DocumentController {
   }
 
   @Get()
-  findAll() :Document[] {
+  findAll()  {
     return this.documentService.findAll();
   }
 
@@ -31,5 +31,10 @@ export class DocumentController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.documentService.remove(+id);
+  }
+
+  @Get('user/:id')
+  findUserDocuments(@Param('id') id: string) {
+    return this.documentService.findUserDocuments(+id);
   }
 }

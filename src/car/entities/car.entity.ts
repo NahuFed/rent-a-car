@@ -27,7 +27,7 @@ export class Car {
     ac: boolean;
 
     @Column()
-    princePerDay: number;
+    pricePerDay: number;
 
     @Column({type: 'datetime', default: () => 'CURRENT_TIMESTAMP'})
     craetedAt?: Date;

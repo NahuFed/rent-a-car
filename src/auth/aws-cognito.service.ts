@@ -118,10 +118,12 @@ export class AwsCognitoService {
 
     try {
       const result = await this.cognitoISP.send(command);
+      const user = await this.userService.getUserByEmail(authLoginUserDto.email);
       return {
         accessToken: result.AuthenticationResult?.AccessToken,
         refreshToken: result.AuthenticationResult?.RefreshToken,
         idToken: result.AuthenticationResult?.IdToken,
+        role: user?.role.name,
       };
     } catch (err) {
       throw new Error('Invalid credentials');

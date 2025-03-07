@@ -10,8 +10,9 @@ export class CreateRentDto {
   @IsNumber()
   userId: number;
 
+  
   @IsNumber()
-  adminId: number;
+  adminId?: number | null;
 
   @IsDate()
   startingDate: Date;

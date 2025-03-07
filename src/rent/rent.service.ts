@@ -30,16 +30,18 @@ export class RentService {
       throw new BadRequestException('The user does not have the required role.');
     }
 
-    const admin = await this.userRepository.findOne({
-      where: { id: adminId },
-      relations: ['role'],
-    });
-    if (!admin) {
-      throw new BadRequestException('The admin does not exist.');
-    }
-
-    if (admin.role.name !== 'admin') {
-      throw new BadRequestException('The admin does not have the required role.');
+    let admin: User | null = null;
+    if (adminId !== null && adminId !== undefined) {
+      admin = await this.userRepository.findOne({
+        where: { id: adminId },
+        relations: ['role'],
+      });
+      if (!admin) {
+        throw new BadRequestException('The admin does not exist.');
+      }
+      if (admin.role.name !== 'admin') {
+        throw new BadRequestException('The admin does not have the required role.');
+      }
     }
 
     const car = await this.carRepository.findOne({
@@ -160,33 +162,6 @@ export class RentService {
     return this.rentRepository.delete(id);
   }
 
-  async extendRent(id: number, newDueDate: Date) {
-    const rent = await this.rentRepository.findOne({
-      where: { id },
-      relations: ['car'],
-    });
-    if (!rent) {
-      throw new BadRequestException('The rent does not exist.');
-    }
-
-    const existingRent = await this.rentRepository.findOne({
-      where: {
-        car: { id: rent.car.id },
-        startingDate: LessThanOrEqual(newDueDate),
-        dueDate: MoreThanOrEqual(rent.startingDate),
-      },
-    });
-
-    if (existingRent && existingRent.id !== id) {
-      throw new BadRequestException(
-        'This car is already rented for the selected period',
-      );
-    }
-
-    rent.dueDate = newDueDate;
-    return this.rentRepository.save(rent);
-  }
-
   async cancelRent(id: number) {
     const rent = await this.rentRepository.findOne({
       where: { id },
@@ -220,37 +195,6 @@ export class RentService {
     });
   }
 
-  findActiveRents() {
-    const today = new Date();
-    return this.rentRepository.find({
-      where: {
-        startingDate: LessThanOrEqual(today),
-        dueDate: MoreThanOrEqual(today),
-      },
-      relations: ['car', 'user', 'admin'],
-    });
-  }
-
-  findPastRents() {
-    const today = new Date();
-    return this.rentRepository.find({
-      where: {
-        dueDate: LessThan(today),
-      },
-      relations: ['car', 'user', 'admin'],
-    });
-  }
-
-  findFutureRents() {
-    const today = new Date();
-    return this.rentRepository.find({
-      where: {
-        startingDate: MoreThan(today),
-      },
-      relations: ['car', 'user', 'admin'],
-    });
-  }
-
   async listRentRequests() {
     return this.rentRepository.find({
       relations: ['car', 'user', 'admin'],
@@ -258,20 +202,30 @@ export class RentService {
     });
   }
 
-  async admitRentRequest(id: number) {
+  async admitRentRequest(id: number, admin: User) {
     const rent = await this.rentRepository.findOne({
       where: { id, rejected: false },
     });
     if (!rent) {
       throw new BadRequestException('The rent does not exist.');
     }
-
+    
+    // Cargar la entidad completa del admin desde la base de datos
+    const adminEntity = await this.userRepository.findOne({
+      where: { id: admin.id },
+      relations: ['role'],
+    });
+    if (!adminEntity) {
+      throw new BadRequestException('Admin not found.');
+    }
+    
     rent.acceptedDated = new Date();
     rent.rejected = false;
+    rent.admin = adminEntity;
     return this.rentRepository.save(rent);
   }
-
-  async rejectRentRequest(id: number) {
+  
+  async rejectRentRequest(id: number, admin: User) {
     const rent = await this.rentRepository.findOne({
       where: { id, rejected: false },
     });
@@ -279,6 +233,11 @@ export class RentService {
       throw new BadRequestException('The rent does not exist.');
     }
 
+    const adminEntity = await this.userRepository.findOne({
+      where: { id: admin.id },
+      relations: ['role'],
+    });
+    rent.admin = adminEntity;
     rent.rejected = true;
     return this.rentRepository.save(rent);
   }
@@ -296,5 +255,16 @@ export class RentService {
       relations: ['car', 'user', 'admin'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async getUnavailableDates(carId: number): Promise<{ start: Date; end: Date }[]> {
+    const rentals = await this.rentRepository.find({
+      where: { car: { id: carId }, acceptedDated: Not(IsNull()) },
+      select: ['startingDate', 'dueDate'],
+    });
+    return rentals.map(rental => ({
+      start: rental.startingDate,
+      end: rental.dueDate as Date,
+    }));
   }
 }

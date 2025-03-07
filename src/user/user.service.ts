@@ -36,7 +36,7 @@ export class UserService {
 
   updateUser(id: number, user: UpdateUserDto) {
     return this.userRepository.update(id, {
-      ...UpdateUserDto,
+      ...user,
       updatedAt: new Date(),
     });
   }

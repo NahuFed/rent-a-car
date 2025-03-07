@@ -46,7 +46,7 @@ describe('CarService', () => {
         color: 'Red',
         passengers: 5,
         ac: true,
-        princePerDay: 50,
+        pricePerDay: 50,
       };
 
       mockCarRepository.create.mockReturnValue(createCarDto);
@@ -69,7 +69,7 @@ describe('CarService', () => {
           color: 'Red',
           passengers: 5,
           ac: true,
-          princePerDay: 50,
+          pricePerDay: 50,
         },
       ];
 
@@ -90,7 +90,7 @@ describe('CarService', () => {
         color: 'Red',
         passengers: 5,
         ac: true,
-        princePerDay: 50,
+        pricePerDay: 50,
       };
 
       mockCarRepository.findOne.mockResolvedValue(car);
@@ -109,7 +109,7 @@ describe('CarService', () => {
         color: 'Blue',
         passengers: 5,
         ac: true,
-        princePerDay: 55,
+        pricePerDay: 55,
       };
 
       mockCarRepository.update.mockResolvedValue(updateCarDto);
