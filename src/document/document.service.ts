@@ -44,10 +44,9 @@ export class DocumentService {
 
   update(id: number, updateDocumentDto: UpdateDocumentDto) {
     return this.documentRepository.update(id, {
-      ...document,
+      ...updateDocumentDto,
       updatedAt: new Date(),
-    }
-    );
+    });
   }
 
   remove(id: number) {

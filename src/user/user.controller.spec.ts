@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { Role } from 'src/role/entities/role.entity';
+import { Role, RoleType } from 'src/role/entities/role.entity';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -43,7 +43,7 @@ describe('UserController', () => {
       email: 'john@doe.com',
       address: '123 Main St',
       country: 'USA',
-      roleName: 'user',
+      role: {name: RoleType.USER} as Role,
     };
 
     const createdUser = {
@@ -51,8 +51,9 @@ describe('UserController', () => {
       id: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
-      role: { name: createUserDto.roleName } as Role,
+      role: { name: createUserDto.role.name } as Role,
       documents: [],
+      rents: []
     } as User;
 
     jest.spyOn(service, 'create').mockResolvedValue(createdUser);

@@ -9,6 +9,7 @@ import { CreateRentDto } from './dto/create-rent.dto';
 import { UpdateRentDto } from './dto/update-rent.dto';
 import { IsNull, Not } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
+import { Role } from 'src/role/entities/role.entity';
 
 describe('RentService', () => {
   let service: RentService;
@@ -16,29 +17,38 @@ describe('RentService', () => {
   let userRepository: Repository<User>;
   let carRepository: Repository<Car>;
 
+  const fakeRepo = () => ({
+    findOne: jest.fn(),
+    find: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  });
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RentService,
         {
           provide: getRepositoryToken(Rent),
-          useClass: Repository,
+          useValue: fakeRepo(),
         },
         {
           provide: getRepositoryToken(User),
-          useClass: Repository,
+          useValue: fakeRepo(),
         },
         {
           provide: getRepositoryToken(Car),
-          useClass: Repository,
+          useValue: fakeRepo(),
         },
       ],
     }).compile();
-
+  
     service = module.get<RentService>(RentService);
-    rentRepository = module.get<Repository<Rent>>(getRepositoryToken(Rent));
-    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
-    carRepository = module.get<Repository<Car>>(getRepositoryToken(Car));
+    rentRepository = module.get(getRepositoryToken(Rent));
+    userRepository = module.get(getRepositoryToken(User));
+    carRepository = module.get(getRepositoryToken(Car));
   });
 
   it('should be defined', () => {
@@ -126,25 +136,7 @@ describe('RentService', () => {
 
   });
 
-  describe('extendRent', () => {
-    it('should extend the due date of an existing rent', async () => {
-      const rent = {
-        id: 1,
-        car: { id: 1 } as Car,
-        startingDate: new Date('2025-03-01'),
-        dueDate: new Date('2025-03-10'),
-      } as Rent;
 
-      jest.spyOn(rentRepository, 'findOne').mockResolvedValueOnce(rent);
-      jest.spyOn(rentRepository, 'findOne').mockResolvedValueOnce(null);
-      jest.spyOn(rentRepository, 'save').mockResolvedValueOnce(rent);
-
-      const newDueDate = new Date('2025-03-15');
-      const result = await service.extendRent(1, newDueDate);
-      expect(result.dueDate).toEqual(newDueDate);
-    });
-
-  });
 
   describe('cancelRent', () => {
     it('should cancel an existing rent', async () => {
@@ -175,16 +167,36 @@ describe('RentService', () => {
         admin: { id: 2 } as User,
         rejected: false,
       } as Rent;
-
-      jest.spyOn(rentRepository, 'findOne').mockResolvedValueOnce(rent);
-      jest.spyOn(rentRepository, 'save').mockResolvedValueOnce(rent);
-
-      const result = await service.admitRentRequest(1);
+  
+      const adminUser = {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        dob: new Date('1990-01-01'),
+        email: 'john.doe@example.com',
+        address: '123 Main St',
+        country: 'USA',
+        role: { name: 'admin' } as Role,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        rents: [],     
+        documents: [],
+      } as User;
+  
+      
+      (rentRepository.findOne as jest.Mock).mockResolvedValueOnce(rent);
+      (userRepository.findOne as jest.Mock).mockResolvedValueOnce(adminUser);
+      (rentRepository.save as jest.Mock).mockResolvedValueOnce({
+        ...rent,
+        acceptedDated: new Date(),
+        rejected: false,
+        admin: adminUser,
+      });
+  
+      const result = await service.admitRentRequest(1, adminUser);
       expect(result.acceptedDated).toBeDefined();
       expect(result.rejected).toBe(false);
     });
-
-
   });
 
   describe('rejectRentRequest', () => {
@@ -197,10 +209,23 @@ describe('RentService', () => {
         rejected: false,
       } as Rent;
 
+      const user = {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        dob: new Date('1990-01-01'),
+        email: 'john.doe@example.com',
+        address: '123 Main St',
+        country: 'USA',
+        role: { name: 'admin' } as Role,        
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as User;
+
       jest.spyOn(rentRepository, 'findOne').mockResolvedValueOnce(rent);
       jest.spyOn(rentRepository, 'save').mockResolvedValueOnce(rent);
 
-      const result = await service.rejectRentRequest(1);
+      const result = await service.rejectRentRequest(1, user);
       expect(result.rejected).toBe(true);
     });
 

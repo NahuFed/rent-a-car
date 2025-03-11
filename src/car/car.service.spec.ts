@@ -97,7 +97,7 @@ describe('CarService', () => {
 
       const result = await service.findOne(1);
       expect(result).toEqual(car);
-      expect(mockCarRepository.findOne).toHaveBeenCalledWith(1);
+      expect(mockCarRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
     });
   });
 
@@ -111,17 +111,19 @@ describe('CarService', () => {
         ac: true,
         pricePerDay: 55,
       };
-
+  
       mockCarRepository.update.mockResolvedValue(updateCarDto);
-      mockCarRepository.findOne.mockResolvedValue(updateCarDto);
-
+      mockCarRepository.findOne.mockResolvedValue({ ...updateCarDto, updatedAt: new Date() });
+  
       const result = await service.update(1, updateCarDto);
       expect(result).toEqual(updateCarDto);
-      expect(mockCarRepository.update).toHaveBeenCalledWith(1, updateCarDto);
-      expect(mockCarRepository.findOne).toHaveBeenCalledWith(1);
+      expect(mockCarRepository.update).toHaveBeenCalledWith(
+        1,
+        { ...updateCarDto, updatedAt: expect.any(Date) }
+      );
+      expect(mockCarRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
     });
   });
-
   describe('remove', () => {
     it('should remove a car', async () => {
       mockCarRepository.delete.mockResolvedValue({ affected: 1 });

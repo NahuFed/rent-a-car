@@ -5,7 +5,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Role } from 'src/role/entities/role.entity';
+import { Role, RoleType } from 'src/role/entities/role.entity';
 
 describe('UserService', () => {
   let service: UserService;
@@ -31,6 +31,7 @@ describe('UserService', () => {
   });
 
   it('should create a new user', async () => {
+    
     const createUserDto: CreateUserDto = {
       firstName: 'John',
       lastName: 'Doe',
@@ -38,7 +39,7 @@ describe('UserService', () => {
       email: 'john@doe.com',
       address: '123 Main St',
       country: 'USA',
-      roleName: 'user',
+      role: {name: RoleType.USER} as Role,
     };
 
     const createdUser = {
@@ -46,8 +47,9 @@ describe('UserService', () => {
       id: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
-      role: {  name: 'user' } as Role,
+      role: {  name: RoleType.USER } as Role,
       documents: [],
+      rents: [],
     } as User;
 
     jest.spyOn(repository, 'create').mockReturnValue(createdUser);
