@@ -4,30 +4,42 @@ import { UpdateDocumentDto } from './dto/update-document.dto';
 import { Document } from './entities/document.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class DocumentService {
 
   constructor(
-    @InjectRepository(Document) private documentRepository: Repository<Document>,
+    @InjectRepository(Document) private readonly documentRepository: Repository<Document>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
   ){}
 
-  create(createDocumentDto: CreateDocumentDto) {
-    const document = this.documentRepository.create(createDocumentDto);
+  async create(createDocumentDto: CreateDocumentDto, userId: number): Promise<Document> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const document = this.documentRepository.create({
+      ...createDocumentDto,
+      user,
+    });
     return this.documentRepository.save(document);
-    
   }
 
   findAll() {
-    return this.documentRepository.find();
-  }
-
-  findOne(id: number) {
-    return this.documentRepository.findOne({
-      where: { id },
-      relations: ['user'],
+    return this.documentRepository.find({
+      relations:['user'],
     }
     );
+  }
+
+  async findOne(id: number) {
+    return this.documentRepository.findOne({
+      where: { id },
+    });
   }
 
   update(id: number, updateDocumentDto: UpdateDocumentDto) {
@@ -48,5 +60,9 @@ export class DocumentService {
       relations: ['user'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async findByUser(userId: number): Promise<Document[]> {
+    return this.documentRepository.find({ where: { user: { id: userId } } });
   }
 }

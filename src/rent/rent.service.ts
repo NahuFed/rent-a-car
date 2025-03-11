@@ -210,7 +210,7 @@ export class RentService {
       throw new BadRequestException('The rent does not exist.');
     }
     
-    // Cargar la entidad completa del admin desde la base de datos
+    
     const adminEntity = await this.userRepository.findOne({
       where: { id: admin.id },
       relations: ['role'],

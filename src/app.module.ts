@@ -21,6 +21,7 @@ import { CarModule } from './car/car.module';
 import { PictureModule } from './picture/picture.module';
 import { CarPictureModule } from './car-picture/car-picture.module';
 import { RentModule } from './rent/rent.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { RentModule } from './rent/rent.module';
     PictureModule,
     CarPictureModule,
     RentModule,
+    S3Module,
   ],
   controllers: [
     AppController,

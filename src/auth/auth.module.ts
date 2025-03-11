@@ -1,4 +1,3 @@
-// filepath: /src/auth/auth.module.ts
 import { Module, forwardRef } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AwsCognitoService } from './aws-cognito.service';
@@ -12,7 +11,7 @@ import { EmailModule } from 'src/email/email.module';
   imports: [
     forwardRef(() => UserModule),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    EmailModule, // Asegúrate de importar EmailModule
+    EmailModule, 
   ],
   controllers: [AuthController],
   providers: [AwsCognitoService, JwtStrategy, RolesGuard],

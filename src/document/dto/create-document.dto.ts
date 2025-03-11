@@ -1,6 +1,8 @@
 export class CreateDocumentDto {
-    readonly title: string;
-    readonly content: string;
-    readonly createdAt: Date;
-    readonly updatedAt: Date;
+    url: string;
+    src: string;
+    description: string;
+    title: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
