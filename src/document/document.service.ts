@@ -1,26 +1,66 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
+import { Document } from './entities/document.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class DocumentService {
-  create(createDocumentDto: CreateDocumentDto) {
-    return 'This action adds a new document';
+
+  constructor(
+    @InjectRepository(Document) private readonly documentRepository: Repository<Document>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ){}
+
+  async create(createDocumentDto: CreateDocumentDto, userId: number): Promise<Document> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const document = this.documentRepository.create({
+      ...createDocumentDto,
+      user,
+    });
+    return this.documentRepository.save(document);
   }
 
   findAll() {
-    return `This action returns all document`;
+    return this.documentRepository.find({
+      relations:['user'],
+    }
+    );
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} document`;
+  async findOne(id: number) {
+    return this.documentRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
   }
 
   update(id: number, updateDocumentDto: UpdateDocumentDto) {
-    return `This action updates a #${id} document`;
+    return this.documentRepository.update(id, {
+      ...updateDocumentDto,
+      updatedAt: new Date(),
+    });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} document`;
+    return this.documentRepository.delete(id);
   }
+
+  async findUserDocuments(user: number) {
+    return this.documentRepository.find({
+      where: { user: {id: user} },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+
 }

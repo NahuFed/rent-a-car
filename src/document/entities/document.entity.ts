@@ -21,7 +21,7 @@ export class Document {
     @Column({type: 'datetime', default: () => 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 
-    @Column({type: 'datetime'})
+    @Column({type: 'datetime', default: () => 'CURRENT_TIMESTAMP'})
     updatedAt: Date;
 
     @ManyToOne(() => User, user => user.documents)
