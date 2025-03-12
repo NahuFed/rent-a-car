@@ -108,3 +108,67 @@ We welcome contributions to improve the project! Follow these steps to contribut
 This project is protected under a custom license. For more information about usage or permissions, please contact the development team.
 
 ---
+
+# Installation and Configuration of External Services for Rent a Car
+
+This project requires several external services to function in a development environment. Here you will find the steps to install and run them using Docker.
+
+## **1. Prerequisites**
+Before starting, make sure you have installed:
+
+- [Docker Desktop](https://www.docker.com/get-started/) (Windows/macOS) or Docker Engine (Linux).
+- Docker Compose (included in Docker Desktop or install manually on Linux with:
+  ```sh
+  sudo apt update
+  sudo apt install docker.io docker-compose
+  ```
+- Verify the installation by running:
+  ```sh
+  docker --version
+  docker-compose --version
+  ```
+
+## **2. Clone the Repository and Configure Docker Compose**
+
+Clone the backend repository where the `docker-compose.yml` file is located:
+```sh
+git clone <REPOSITORY_URL>
+cd <REPOSITORY_NAME>
+```
+
+## **3. Download and Run the Services**
+
+To ensure you are using the latest versions of the containers, first download the required images:
+```sh
+docker-compose pull
+```
+
+Then, start the services in the background:
+```sh
+docker-compose up -d
+```
+This will start the following services:
+- Cognito Local on port `9229`
+- MinIO on ports `9000` and `9001`
+- Redis on port `6379`
+
+## **4. Verify that the Services Are Running**
+Run:
+```sh
+docker ps
+```
+You should see the `cognito-local`, `minio`, and `redis` containers running.
+
+To stop the services:
+```sh
+docker-compose down
+```
+
+## **5. Access the Services**
+- **MinIO Web UI:** [http://localhost:9001](http://localhost:9001) (user: `minioadmin`, password: `minioadmin`)
+- **Cognito Local:** [http://localhost:9229](http://localhost:9229)
+- **Redis:** Does not have a graphical interface, but you can connect from the backend application.
+
+---
+Now you can continue with the backend configuration and test the integration with these services. 🚀
+
