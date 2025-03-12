@@ -81,7 +81,7 @@ describe('DocumentService', () => {
   });
 
   describe('findAll', () => {
-    it('should return all documents', async () => {
+    it('should return all documents with user relation', async () => {
       const documents = [{ id: 1, title: 'Test Document', content: 'Test Content' }];
       documentRepository.find.mockResolvedValue(documents);
 
@@ -93,44 +93,48 @@ describe('DocumentService', () => {
   });
 
   describe('findOne', () => {
-    it('should return a document by id', async () => {
-      const document = { id: 1, title: 'Test Document', content: 'Test Content' };
-      documentRepository.findOne.mockResolvedValue(document);
+    it('should return a document by id with user relation', async () => {
+      const doc = { id: 1, title: 'Test Document', content: 'Test Content' };
+      documentRepository.findOne.mockResolvedValue(doc);
 
       const result = await service.findOne(1);
 
-      expect(documentRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
-      expect(result).toEqual(document);
+      expect(documentRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['user'] });
+      expect(result).toEqual(doc);
     });
   });
 
   describe('update', () => {
-    it('should update a document', async () => {
+    it('should update a document with new updatedAt date', async () => {
       const updateDocumentDto = { title: 'Updated Document', content: 'Updated Content' };
-      const document = { id: 1, ...updateDocumentDto, updatedAt: new Date() };
-
-      documentRepository.update.mockResolvedValue(document);
+      // Simulate repository update returns an UpdateResult (o similar)
+      const updateResult = { affected: 1 };
+      documentRepository.update.mockResolvedValue(updateResult);
 
       const result = await service.update(1, updateDocumentDto);
 
-      expect(documentRepository.update).toHaveBeenCalledWith(1, { ...updateDocumentDto, updatedAt: expect.any(Date) });
-      expect(result).toEqual(document);
+      expect(documentRepository.update).toHaveBeenCalledWith(1, { 
+        ...updateDocumentDto, 
+        updatedAt: expect.any(Date) 
+      });
+      expect(result).toEqual(updateResult);
     });
   });
 
   describe('remove', () => {
     it('should remove a document', async () => {
-      documentRepository.delete.mockResolvedValue({ affected: 1 });
+      const deleteResult = { affected: 1 };
+      documentRepository.delete.mockResolvedValue(deleteResult);
 
       const result = await service.remove(1);
 
       expect(documentRepository.delete).toHaveBeenCalledWith(1);
-      expect(result).toEqual({ affected: 1 });
+      expect(result).toEqual(deleteResult);
     });
   });
 
   describe('findUserDocuments', () => {
-    it('should return documents for a user', async () => {
+    it('should return documents for a user with ordering and relations', async () => {
       const userId = 1;
       const documents = [{ id: 1, title: 'Test Document', content: 'Test Content' }];
       documentRepository.find.mockResolvedValue(documents);
@@ -142,19 +146,6 @@ describe('DocumentService', () => {
         relations: ['user'],
         order: { createdAt: 'DESC' },
       });
-      expect(result).toEqual(documents);
-    });
-  });
-
-  describe('findByUser', () => {
-    it('should return documents by user id', async () => {
-      const userId = 1;
-      const documents = [{ id: 1, title: 'Test Document', content: 'Test Content' }];
-      documentRepository.find.mockResolvedValue(documents);
-
-      const result = await service.findByUser(userId);
-
-      expect(documentRepository.find).toHaveBeenCalledWith({ where: { user: { id: userId } } });
       expect(result).toEqual(documents);
     });
   });

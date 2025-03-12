@@ -235,8 +235,8 @@ describe('RentService', () => {
   describe('findRentsByStatus', () => {
     it('should find accepted rents', async () => {
       const rents = [
-        { id: 1, acceptedDated: new Date(), rejected: false } as Rent,
-        { id: 2, acceptedDated: new Date(), rejected: false } as Rent,
+        { id: 1, acceptedDated: new Date(), rejected: false, endDate: null } as Rent,
+        { id: 2, acceptedDated: new Date(), rejected: false, endDate: null } as Rent,
       ];
 
       jest.spyOn(rentRepository, 'find').mockResolvedValueOnce(rents);
@@ -244,7 +244,7 @@ describe('RentService', () => {
       const result = await service.findRentsByStatus('accepted');
       expect(result).toEqual(rents);
       expect(rentRepository.find).toHaveBeenCalledWith({
-        where: { acceptedDated: Not(IsNull()), rejected: false },
+        where: { acceptedDated: Not(IsNull()), rejected: false, endDate: IsNull() },
         relations: ['car', 'user', 'admin'],
       });
     });
@@ -277,6 +277,22 @@ describe('RentService', () => {
       expect(result).toEqual(rents);
       expect(rentRepository.find).toHaveBeenCalledWith({
         where: { rejected: true },
+        relations: ['car', 'user', 'admin'],
+      });
+    });
+
+    it('should find finished rents', async () => {
+      const rents = [
+        { id: 1, endDate: new Date() } as Rent,
+        { id: 2, endDate: new Date() } as Rent,
+      ];
+
+      jest.spyOn(rentRepository, 'find').mockResolvedValueOnce(rents);
+
+      const result = await service.findRentsByStatus('finished');
+      expect(result).toEqual(rents);
+      expect(rentRepository.find).toHaveBeenCalledWith({
+        where: { endDate: Not(IsNull()) },
         relations: ['car', 'user', 'admin'],
       });
     });

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DocumentController } from './document.controller';
 import { DocumentService } from './document.service';
 import { S3Service } from 'src/s3/s3.service';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 describe('DocumentController', () => {
   let controller: DocumentController;
@@ -16,7 +16,7 @@ describe('DocumentController', () => {
       findOne: jest.fn(),
       update: jest.fn(),
       remove: jest.fn(),
-      findByUser: jest.fn(),
+      findUserDocuments: jest.fn(),
     };
 
     s3Service = {
@@ -83,12 +83,36 @@ describe('DocumentController', () => {
   });
 
   describe('update', () => {
-    it('should update a document', async () => {
+    it('should update a document when the user is authorized', async () => {
       const updateDocumentDto = { title: 'Updated Title' };
-      (documentService.update as jest.Mock).mockResolvedValue(updateDocumentDto);
-      const result = await controller.update('1', updateDocumentDto);
+      const doc = { id: 1, src: 'documents/doc1.jpg', title: 'Doc 1', user: { id: 1 } };
+      const req = { user: { id: 1 } };
+
+      (documentService.findOne as jest.Mock).mockResolvedValue(doc);
+      (documentService.update as jest.Mock).mockResolvedValue({ ...doc, ...updateDocumentDto });
+      
+      const result = await controller.update(1, updateDocumentDto, req);
+      expect(documentService.findOne).toHaveBeenCalledWith(1);
       expect(documentService.update).toHaveBeenCalledWith(1, updateDocumentDto);
-      expect(result).toEqual(updateDocumentDto);
+      expect(result).toEqual({ ...doc, ...updateDocumentDto });
+    });
+
+    it('should throw UnauthorizedException when the user is not authorized to update the document', async () => {
+      const updateDocumentDto = { title: 'Updated Title' };
+      const doc = { id: 1, src: 'documents/doc1.jpg', title: 'Doc 1', user: { id: 1 } };
+      const req = { user: { id: 2 } };
+
+      (documentService.findOne as jest.Mock).mockResolvedValue(doc);
+      
+      await expect(controller.update(1, updateDocumentDto, req)).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should throw NotFoundException if the document does not exist', async () => {
+      const updateDocumentDto = { title: 'Updated Title' };
+      const req = { user: { id: 1 } };
+      (documentService.findOne as jest.Mock).mockResolvedValue(null);
+      
+      await expect(controller.update(1, updateDocumentDto, req)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -101,20 +125,40 @@ describe('DocumentController', () => {
     });
   });
 
-  describe('findUserDocuments', () => {
-    it('should return documents for the user with presigned URLs', async () => {
+  describe('findMyDocuments', () => {
+    it('should return documents for the authenticated user with presigned URLs', async () => {
       const req = { user: { id: 1 } };
       const docs = [
         { id: 1, src: 'documents/doc1.jpg', title: 'Doc 1' },
         { id: 2, src: 'documents/doc2.jpg', title: 'Doc 2' },
       ];
-      (documentService.findByUser as jest.Mock).mockResolvedValue(docs);
+      (documentService.findUserDocuments as jest.Mock).mockResolvedValue(docs);
       (s3Service.getPresignedUrl as jest.Mock).mockImplementation((src: string) =>
         Promise.resolve(`http://signedurl.com/${src}`)
       );
 
-      const result = await controller.findUserDocuments(req);
-      expect(documentService.findByUser).toHaveBeenCalledWith(1);
+      const result = await controller.findMyDocuments(req);
+      expect(documentService.findUserDocuments).toHaveBeenCalledWith(1);
+      expect(s3Service.getPresignedUrl).toHaveBeenCalledTimes(docs.length);
+      expect(result).toEqual(
+        docs.map((doc) => ({ ...doc, url: `http://signedurl.com/${doc.src}` }))
+      );
+    });
+  });
+
+  describe('findUserDocuments', () => {
+    it('should return documents for a specified user with presigned URLs', async () => {
+      const docs = [
+        { id: 1, src: 'documents/doc1.jpg', title: 'Doc 1' },
+        { id: 2, src: 'documents/doc2.jpg', title: 'Doc 2' },
+      ];
+      (documentService.findUserDocuments as jest.Mock).mockResolvedValue(docs);
+      (s3Service.getPresignedUrl as jest.Mock).mockImplementation((src: string) =>
+        Promise.resolve(`http://signedurl.com/${src}`)
+      );
+
+      const result = await controller.findUserDocuments('1');
+      expect(documentService.findUserDocuments).toHaveBeenCalledWith(1);
       expect(s3Service.getPresignedUrl).toHaveBeenCalledTimes(docs.length);
       expect(result).toEqual(
         docs.map((doc) => ({ ...doc, url: `http://signedurl.com/${doc.src}` }))
