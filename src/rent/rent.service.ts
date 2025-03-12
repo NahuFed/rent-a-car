@@ -56,6 +56,8 @@ export class RentService {
         car: { id: carId },
         startingDate: LessThanOrEqual(dueDate as Date),
         dueDate: MoreThanOrEqual(startingDate as Date),
+        acceptedDated: Not(IsNull()),
+        endDate: IsNull(),
       },
     });
 
@@ -178,13 +180,16 @@ export class RentService {
     let where;
     switch (status) {
       case 'accepted':
-      where = { acceptedDated: Not(IsNull()), rejected: false };
+      where = { acceptedDated: Not(IsNull()), rejected: false, endDate: IsNull()  };
       break;
       case 'pending':
       where = { acceptedDated: IsNull(), rejected: false };
       break;
       case 'rejected':
       where = { rejected: true };
+      break;
+      case 'finished':
+      where = { endDate: Not(IsNull()) };
       break;
       default:
       throw new BadRequestException('Invalid status.');
@@ -205,11 +210,25 @@ export class RentService {
   async admitRentRequest(id: number, admin: User) {
     const rent = await this.rentRepository.findOne({
       where: { id, rejected: false },
+      relations: ['car'],
     });
     if (!rent) {
       throw new BadRequestException('The rent does not exist.');
     }
-    
+
+    const overlappingRent = await this.rentRepository.findOne({
+      where: {
+        car: { id: rent.car.id },
+        startingDate: LessThanOrEqual(rent.dueDate as Date),
+        dueDate: MoreThanOrEqual(rent.startingDate as Date),
+        acceptedDated: Not(IsNull()),
+        endDate: IsNull(),
+      },
+    });
+
+    if (overlappingRent) {
+      throw new BadRequestException('There is already an active rent for this car that overlaps with the requested period.');
+    } 
     
     const adminEntity = await this.userRepository.findOne({
       where: { id: admin.id },
@@ -267,4 +286,18 @@ export class RentService {
       end: rental.dueDate as Date,
     }));
   }
+
+  async finishRent(id: number) {
+    const rent = await this.rentRepository.findOne({
+      where: { id },
+      relations: ['car', 'user', 'admin'],
+    });
+    if (!rent) {
+      throw new BadRequestException('The rent does not exist.');
+    }
+    rent.endDate = new Date();
+    return this.rentRepository.save(rent);
+  }
+
+
 }

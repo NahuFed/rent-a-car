@@ -39,6 +39,7 @@ export class DocumentService {
   async findOne(id: number) {
     return this.documentRepository.findOne({
       where: { id },
+      relations: ['user'],
     });
   }
 
@@ -61,7 +62,5 @@ export class DocumentService {
     });
   }
 
-  async findByUser(userId: number): Promise<Document[]> {
-    return this.documentRepository.find({ where: { user: { id: userId } } });
-  }
+
 }
