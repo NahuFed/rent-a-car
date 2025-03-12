@@ -28,7 +28,7 @@ export class User {
     country: string;
 
     @ManyToOne(() => Role, role => role.users, {eager: true})
-    @JoinColumn({name: 'roleName'})
+    @JoinColumn({name: 'role'})
     role: Role;
 
     @OneToMany(() => Document, document => document.user)   
