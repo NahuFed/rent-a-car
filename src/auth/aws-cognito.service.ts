@@ -20,6 +20,7 @@ import { UserService } from 'src/user/user.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import * as crypto from 'crypto';
+import { UnauthorizedException } from '@nestjs/common';
 @Injectable()
 export class AwsCognitoService {
   private userPool: CognitoUserPool;
@@ -126,7 +127,7 @@ export class AwsCognitoService {
         role: user?.role.name,
       };
     } catch (err) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid email or password');
     }
   }
 

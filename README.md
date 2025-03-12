@@ -213,34 +213,7 @@ DB_NAME=rent_a_car
 ```
 Now, restart the backend and it will automatically create the necessary tables using TypeORM.
 
----
-# Configuration Guide for .env.development:
-
-## 1. Local Cognito Configuration
-Variables:
-
-- **`AWS_COGNITO_USER_POOL_ID`**: ID of the user pool in Cognito.  
-- **`AWS_COGNITO_CLIENT_ID`**: Application client ID.  
-- **`AWS_COGNITO_ENDPOINT`**: URL of the local Cognito service.  
-- **`AWS_COGNITO_AUTHORITY`**: Authentication authority (`AWS_COGNITO_ENDPOINT` + `AWS_COGNITO_USER_POOL_ID`).  
-- **`AWS_REGION`**: Configured region (even if local, Cognito may require one).  
-
-## 2. MinIO Configuration (Local S3)
-Variables:
-
-- **`S3_BUCKET_NAME`**: Name of the storage bucket.  
-- **`S3_BUCKET_REGION`**: Bucket region (can be a generic one like `us-east-1`).  
-- **`S3_BUCKET_ACCESS_KEY_ID`**: Access key for MinIO.  
-- **`S3_SECRET_KEY`**: Secret key for MinIO.  
-
-## 3. Bull + Redis Configuration
-*(No specific variables provided for this section yet.)*
-
-## 4. Email Sending Configuration (Nodemailer)
-Variables:
-
-- **`EMAIL_USER`**: Authenticated user for sending emails.  
-- **`EMAIL_PASS`**: Password or access token.  
+  
 ---
 ## Creating a Bucket in MinIO
 
@@ -341,3 +314,48 @@ To use Gmail with Nodemailer, you need an **App Password** if two-factor authent
 - Test your Nodemailer setup to confirm the email sends correctly using the new `EMAIL_PASS`.
 
 For more details, see Google’s [App Passwords help page](https://support.google.com/accounts/answer/185833).
+
+---
+---
+# Configuration Guide for .env.development:
+
+## 1. Local Cognito Configuration
+Variables:
+
+- **`AWS_COGNITO_USER_POOL_ID`**: The ID of the Cognito user pool.  
+  To obtain this variable, run:
+  ```bash
+  aws cognito-idp list-user-pools --max-results 60 --endpoint-url http://localhost:9229
+  ```
+  This command will display the exact ID you need. For this tutorial, we are using `"local_11aaaaA"` as an example.
+
+- **`AWS_COGNITO_CLIENT_ID`**: The application client ID.  
+  Once you have your user pool ID, you can obtain the client ID by running:
+  ```bash
+  aws cognito-idp list-user-pool-clients --user-pool-id local_11aaaaA --endpoint-url http://localhost:9229/
+  ```
+  Replace `local_11aaaaA` with your own user pool ID.
+
+- **`AWS_COGNITO_ENDPOINT`**: Set this to `http://localhost:9229/`.
+
+- **`AWS_COGNITO_AUTHORITY`**: This is the concatenation of `AWS_COGNITO_ENDPOINT` and `AWS_COGNITO_USER_POOL_ID`.  
+  Example: `http://localhost:9229/local_11aaaaA`.
+
+- **`AWS_REGION`**: The AWS region to use (e.g., `us-east-1`).
+
+## 2. MinIO Configuration (Local S3)
+Variables:
+
+- **`S3_BUCKET_NAME`**: Name of the storage bucket.  
+- **`S3_BUCKET_REGION`**: Bucket region (can be a generic one like `us-east-1`).  
+- **`S3_BUCKET_ACCESS_KEY_ID`**: Access key for MinIO.  
+- **`S3_SECRET_KEY`**: Secret key for MinIO.  
+
+## 3. Bull + Redis Configuration
+*(No specific variables provided for this section yet.)*
+
+## 4. Email Sending Configuration (Nodemailer)
+Variables:
+
+- **`EMAIL_USER`**: Authenticated user for sending emails.  
+- **`EMAIL_PASS`**: Password or access token.
